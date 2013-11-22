@@ -1,0 +1,72 @@
+{{>header title}}
+
+<div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span8 offset2 question_background">
+
+                {{#unless infiniteRadius}}
+                    <h5>
+                    There {{#if singular}}is {{else}}are {{/if}}{{categories.[0]/number}} rating{{#unless singular}}s{{/unless}} within {{radius}} km of the starting point
+                    </h5>
+                {{/unless }}
+                {{#if infiniteRadius}}
+                <h5>
+                    There are {{ categories.[0]/number}} ratings worldwide
+                </h5>
+                {{/if}}
+                </div>
+            </div>
+            
+            <div class="spacer10"></div>
+
+            <div class="row-fluid">
+                <div class="span8 offset2 question_background">
+                    <h5>
+                    Select the type of location to view{{#unless default}}, or try again with a different search radius</h5>{{else}} or choose a starting point to view local ratings</h5>
+                  <a href="selectlandingread.html" class="btn btn-primary">Starting Point</a>{{/unless}}
+
+                    <div class="controls">
+                      <label class="radio inline" style="padding-left:0px;">View as...</label>
+                      <label class="radio inline" for="map">
+                        <input type="radio" id="map" name="view_group" value="map" checked="checked"> Map
+                      </label>
+                      <label class="radio inline" for="text">
+                        <input type="radio" id="text" name="view_group" value="text"> Text
+                      </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="spacer10"></div>
+
+            <div class="row-fluid">
+              <div class="span8 offset2 question_background">
+              {{#if categories.[0]/number}}
+                <ul class="nav nav-tabs nav-stacked white-text">
+                {{#each categories}}
+                	{{#if number}}
+                	<li><a href="#" {{idFromName name}} name="categories_group"><h5>{{name}} ({{number}})</h5></a></li>
+                	{{/if}}
+                  {{/each}}
+                    </ul>
+              {{/if}}
+              {{#else}}
+              	Sorry, no results were found. Try again with a different search radius or location, or share some ratings yourself!
+              {{/else}}
+              </div>
+            </div>
+
+            {{#unless default}}
+            <div class="spacer10"></div>
+            <div class="row-fluid">
+              <div class="span8 offset2 question_background">
+                {{>radiusform this}}
+                </div>
+            </div>
+            {{/unless}}
+
+
+        </div>
+
+{{>modal}}

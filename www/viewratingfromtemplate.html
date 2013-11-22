@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->  
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Age-CAP</title>
+
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrapresponsive.min.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <div class="shoesNav container-fluid"></div>
+
+  <script src="js/vendor/modernizr262respond110min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.js"></script>
+  <script type="text/javascript" src="Handlebars.js"></script>
+  <script type="text/javascript" src="templates/templates.js"></script>
+  <script src="js/vendor/bootstrap.min.js"></script>
+  <script>
+
+    var title = localStorage.getItem("nameToView");
+    var postal_code = localStorage.getItem("postalCodeToView");
+    var table = localStorage.getItem("tableToView");
+    var typeName = JSON.parse(localStorage.getItem("names"))[table];
+    var questions = JSON.parse(localStorage.getItem("questions"))[table];
+
+    Handlebars.registerHelper("getNumber", function(context, options) {
+          if (options.data) return options.data["index"] + 1;
+          else return "";
+        });
+
+    /*Handlebars.registerHelper("addListener", function(context, options) {
+          $(document).ready(function() {
+              $('#view'+context["id"]).click(function() {
+                localStorage.setItem("typeToView", context["type"])
+                localStorage.setItem("radius", 10)
+                localStorage.setItem("starting_coords", JSON.stringify({lat:context["lat"], lng:context["lng"]}))
+
+              });
+              $('#rate'+context["id"]).click(function() {
+                localStorage.setItem("ratingLocation", JSON.stringify({context["ratingLocation"]}))
+                }
+              });
+          });
+        });*/
+
+    Handlebars.registerHelper("getText", function(context, questions, options) {
+          return questions[options.data["index"]]; 
+        });
+
+    Handlebars.registerHelper("getArrAvg", function(context, options) {
+
+        numericalList = context.filter(function(x) {return (typeof(x) == 'number');})
+        if (!numericalList.length) {return 0};
+        sum = numericalList.reduce(function(a,b) {return a + b;});
+        return Math.round((sum / numericalList.length)*10)/10; 
+
+      });
+
+    Handlebars.registerHelper("getLocAvg", function(context, options) {
+
+        all = context.ratings
+                     .reduce(function(a,b) {c = {}; c.scores = a.scores.concat(b.scores); return c;})
+                     .scores;
+
+        numericalList = all.filter(function(x) {return (typeof(x) == 'number');})
+        if (!numericalList.length) {return 0};
+        sum = numericalList.reduce(function(a,b) {return a + b;});
+        return Math.round((sum / numericalList.length)*10)/10; 
+
+      });
+
+    Handlebars.partials = Handlebars.templates;
+    var compiledTemplate = Handlebars.templates['viewratings'];
+    var ratings; $.post('http://142.150.169.179/view_ratings.php', {name:title, postal_code:postal_code, table:table}, function(data){
+                ratings = JSON.parse(data);
+                compile();
+              });
+
+    function compile() {
+      view_location =  {title:title, category:typeName, questions:questions, ratings:ratings};
+      $(".shoesNav").append (compiledTemplate(view_location));
+      main();
+    }
+  </script>
+
+  <script src="js/main.js"></script>
+</body>

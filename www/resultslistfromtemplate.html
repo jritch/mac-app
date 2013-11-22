@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->  
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Age-CAP</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrapresponsive.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <script src="js/vendor/modernizr262respond110min.js"></script>
+</head>
+<body>
+    <div class="shoesNav container-fluid"></div>    
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.js"></script>
+    <script type="text/javascript" src="Handlebars.js"></script>
+    <script type="text/javascript" src="templates/templates.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/bounding.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+
+        function getFromValue(value, dictionary){
+
+            for(var key in dictionary){
+                if (dictionary[key] == value){
+                    return key;
+                }
+            }
+            return undefined;
+        }
+
+        function displayPage(data){
+
+            Handlebars.registerHelper("idFromName", function(name, options) {
+
+                id = '';
+                dict = JSON.parse(localStorage.getItem("names"));
+
+                for(var key in dict){
+                    if (dict[key] == name){
+                        id = key;
+                    }
+                }
+                return "id="+id;
+            });
+
+            Handlebars.partials = Handlebars.templates;
+            var compiledTemplate = Handlebars.templates['resultslist'];
+
+            categories = JSON.parse(data);
+            j=categories.length;
+            
+            for(i=0;i<j;i++){
+                categories[i]["name"] = names[categories[i]["name"]];
+                categories[i]["number"] = Number(categories[i]["number"])
+            }
+
+            context = {number: categories.length, 
+                     title:'Results', 
+                     radius:radius,
+                     infiniteRadius: (radius == "all"),
+                     categories:categories, 
+                     singular:(categories[0].number == 1), 
+                     default: Number(localStorage.getItem("default"))
+                   };
+                            
+            $(".shoesNav").append(compiledTemplate(context));
+        }
+
+        function addMovingParts(){
+            //this executes the functions from main.js after the template has loaded
+            main();
+
+            $("#apply").click(function(){
+                new_radius = $('[name="radius_group"]:checked').attr("value");
+                localStorage.setItem("radius", new_radius);
+            })
+            $('[name="categories_group"]').click(function(){
+                var clicked = $(this);
+                localStorage.setItem("typeToView", clicked.attr("id"));
+                checked = $('[name="view_group"]:checked').attr("value");
+                if (checked == "text") window.location.href = "entrieslistfromtemplate.html"
+                else window.location.href = "mapentries.html"
+                console.log(checked);
+            })
+        }
+      
+        var coords = JSON.parse(localStorage.getItem("starting_coords")); 
+        var radius = localStorage.getItem("radius");
+        var names = JSON.parse(localStorage.getItem("names"));
+      
+        if (radius == "all"){
+          dataArray={names:names, infiniteRadius:1};
+        }
+
+        else{
+          var boundingArray = boundingCoordinates(Number(radius), 6371, coords["lat"], coords["lng"]);
+          var dataArray = {names:names, minLat:boundingArray["minLat"], maxLat:boundingArray["maxLat"], minLng:boundingArray["minLon"], maxLng:boundingArray["maxLon"]}
+        }
+
+        localStorage.setItem("dataArray", JSON.stringify(dataArray));
+
+        $.post('http://142.150.169.179/results_list.php', dataArray, function(data){
+            displayPage(data);
+            addMovingParts();
+        });
+
+    </script>
+</body>

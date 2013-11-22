@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->  
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+ <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Age-CAP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrapresponsive.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/spinner.css">
+        <script src="js/vendor/modernizr262respond110min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+        <div id="content"></div>
+        
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery191min.js"><\/script>')</script> <!--- failsafe to load up jQuery if the online copy is unavailable-->
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/bounding.js"></script>
+    <script type="text/javascript" src="Handlebars.js"></script> 
+    <script type="text/javascript" src="templates/templates.js"></script>
+
+<script>
+
+var resultsArray= new Array();
+var i;
+
+function getEntries(){
+  coords = JSON.parse(localStorage.getItem("starting_coords"));
+
+  radius = localStorage.getItem("radius");
+  if (radius != "all") radius = Number(radius);
+
+  table = localStorage.getItem("typeToView");
+  names = JSON.parse(localStorage.getItem("names"));
+  name = names[table]
+
+  if(radius != "all") message = "Viewing " + name + " Locations within " + radius + " kilometers";
+  else message = "Viewing " + name + " Locations Worldwide";
+
+  $("#headline").html(message);
+
+  dataArray = JSON.parse(localStorage.getItem("dataArray"));
+  dataArray["table"] = table;    
+  console.log(dataArray);
+  $.ajax({type:'POST', 
+    url:'http://142.150.169.179/list_entries.php', 
+    dataType: 'json', 
+    data:dataArray, 
+    success: function (data){console.log(a=data); populateList(data);}, 
+    error: function(data){resultsArray = data; $('#content').html(data.responseText);}});
+}
+
+function populateList(data){ 
+
+    var data = data;
+
+    for ((j=data.length-1);j>=0;j--)
+    {
+      data[j].name = names[data[j].name];
+    }
+
+    //replaces table names with user-friendly names
+
+  context = {title:'Results', 
+             radius:radius,
+             infiniteRadius: (radius == "all"),
+             categories:data,
+             name:name,
+             default: Number(localStorage.getItem("default"))
+           };
+
+  Handlebars.partials = Handlebars.templates;
+  var compiledTemplate = Handlebars.templates['entrieslist']; 
+  var html = compiledTemplate(context);
+
+  $("#content").append (html);
+
+  $(".entry").click(function (){
+    path = $(this).attr("id");
+    context = eval("data" + path);
+    localStorage.setItem("tableToView", context["table"])
+    localStorage.setItem("nameToView", context["name"])
+    localStorage.setItem("postalCodeToView", context["postal"])
+    window.location.href = "viewratingfromtemplate.html"
+  });
+
+  $(".more").click(function (){
+    table = $(this).attr("id");
+    dataArray["table"] = table;
+    localStorage.setItem("dataArray", JSON.stringify(dataArray))
+    localStorage.setItem("typeToView", table)
+    window.location.href = "entrieslistfromtemplate.html"
+
+  });
+}
+
+getEntries(); 
+
+</script>
+    </body>
+</html>

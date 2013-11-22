@@ -1,0 +1,133 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Age-CAP</title>
+
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrapresponsive.min.css">
+  <link rel="stylesheet" href="css/main.css">
+
+</head>
+<body> 
+  <div class="ratingform container-fluid"></div>
+
+  <script src="js/vendor/modernizr262respond110min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.js"></script>
+  <script type="text/javascript" src="Handlebars.js"></script>
+  <script type="text/javascript" src="templates/templates.js"></script>
+  <script src="js/vendor/bootstrap.min.js"></script>
+  <script>
+
+  //This fetches a bit of info about the location that is necessary
+  //for the Handlebars context
+
+  var type = localStorage.getItem("typeToRate");
+  var typeName = JSON.parse(localStorage.getItem("names"))[type];
+  var questions = JSON.parse(localStorage.getItem("questions"))[type];
+
+  //Handlebars code handles setting up the page for viewing
+  Handlebars.registerHelper("getNumber", function(context, options) {
+        if (options.data) return options.data["index"] + 1;
+        else return "";
+      });
+
+  Handlebars.registerHelper("ifisOdd", function(context, options) {
+        if((options.data["index"] + 1 )% 2) {return options.fn(context);} 
+        else if (context.number % 2) {return options.fn(context);}
+        else return "";
+      });
+
+  Handlebars.registerHelper("ifisEven", function(context, options) {
+        if((options.data["index"] + 1 )% 2 == 0) {return options.fn(context);}
+        else if (context.number % 2 == 0) {return options.fn(context);}
+        else return ""; 
+      });
+  
+  //compiles the ratingform.handlebars template to html 
+  //and appends it to the .ratingform element
+
+  Handlebars.partials = Handlebars.templates;
+  var compiledTemplate = Handlebars.templates['ratingform']; 
+  var context = {title:'Rate a '+ typeName, allQuestions:questions}
+  context["number"] = context.allQuestions.length;
+  var html = compiledTemplate(context);
+
+  $(".ratingform").append (html);
+  //End Handlebars code
+
+  function getArrAvg(context) {
+    //filters out the non-numerical entries
+    //returns the average of the filtered array
+
+    numericalList = context.filter(function(x) {return (typeof(x) == 'number');})
+    if (!numericalList.length) {return 0};
+    sum = numericalList.reduce(function(a,b) {return a + b;});
+    return sum / numericalList.length;
+
+      }
+
+  //Submission code 
+  //handles calling the PHP script 
+  //sends the rating and location info to the database
+
+  $("#submit").click(function () {
+
+  	//This collects all the ratings inputted by the user into an array
+  	var ratingsArray = [];
+  	i = 1;
+  	for (var j = context.number; i <= j; i++) {
+
+  		name = "#group" + i + " .active";
+  		
+      ratingsArray[i-1] = $.trim($(name).text());
+      
+      if (ratingsArray[i-1] == ""){
+        ratingsArray[i-1] = "undefined";
+      }
+
+  		if (!isNaN(ratingsArray[i-1])){
+  			ratingsArray[i-1] = Number(ratingsArray[i-1]);
+  		}
+  	}
+
+  	//This bundles all the data into a JSON array so that it can be sent via POST
+  	submission = JSON.parse(localStorage.getItem("ratingLocation"));
+    submission["ratings"] = ratingsArray;
+    submission["comment"] = $("#comment").val()
+    submission["table"] = type;   
+    submission["userID"] = localStorage.getItem("userID");
+    submission["avg"] = getArrAvg(ratingsArray);
+    console.log(submission);
+
+
+  	//store the submission so we can verify it's all a-okay (testing only)
+  	//localStorage.setItem("submission", JSON.stringify(submission));
+
+  	//Now POST it off!
+  	$.post('http://142.150.169.179/rating_form.php', submission, function(data){
+              window.location.href = "rateagain.html";
+            });
+
+  });
+
+  // this is a temporary fix for a bug that occurs on the iPad
+  // when the keyboard is called to access the comment box,
+  // the header displays incorrectly
+
+  $("#comment").on("focus", function () {
+      $(window).on("scroll", function(){
+        console.log("bump");
+        $("#comment").blur();
+        $(window).off("scroll");
+      });
+  });
+
+  </script>
+  <script src="js/main.js"></script>
+</body>
+

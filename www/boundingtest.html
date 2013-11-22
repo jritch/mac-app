@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <![endif]-->
+
+ <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Age-CAP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrapresponsive.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <script src="js/vendor/modernizr262respond110min.js"></script>
+    </head>
+    <body>
+    <div class="container-fluid "
+    <div class="row-fluid"> <div class="span4 offset4">
+    <div id="map" style="height:500px;width:500px;float:center;"></div>
+    </div></div></div>
+    
+    <script src="js/bounding.js">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery191min.js"><\/script>')</script> ]
+    <!--- ^ failsafe to load up jQuery if the online copy is unavailable-->
+    <script src="js/vendor/bootstrap.min.js"></script>
+    
+<script src="js/main.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+
+    <script>
+        var array1 = boundingCoordinates(5, 6371, 43.6481, -79.4042);
+
+        var latlng = new google.maps.LatLng(43.6481, -79.4042);
+
+        var latlng_top_right = new google.maps.LatLng(array1["maxLat"], array1["maxLon"]);
+
+        var latlng_top_left = new google.maps.LatLng(array1["minLat"], array1["maxLon"]);
+
+        var latlng_bottom_right = new google.maps.LatLng(array1["maxLat"], array1["minLon"]);
+
+        var latlng_bottom_left = new google.maps.LatLng(array1["minLat"], array1["minLon"]);
+
+
+
+        var mapOptions = {
+            zoom: 12,
+            center: latlng,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            zoomControl: true,
+            mapTypeControl: false,
+            zoomControlOptions: {
+              style: google.maps.ZoomControlStyle.SMALL,
+              position: google.maps.ControlPosition.LEFT_TOP
+            } 
+        };
+        var myMap = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+
+        marker_center = new google.maps.Marker({
+          position: latlng,
+          map: myMap,
+          title: "center"
+        });
+
+        marker_tr = new google.maps.Marker({
+          position: latlng_top_right,
+          map: myMap,
+          title: "top_right"
+        });
+
+        marker_tl = new google.maps.Marker({
+          position: latlng_top_left,
+          map: myMap,
+          title: "top_left"
+        });
+
+        marker_br = new google.maps.Marker({
+          position: latlng_bottom_right,
+          map: myMap,
+          title: "bot_right"
+        });
+
+        marker_bl = new google.maps.Marker({
+          position: latlng_bottom_left,
+          map: myMap,
+          title: "bot_left"
+        });
+
+    </script>
+    
+    </body>

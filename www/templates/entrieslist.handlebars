@@ -1,0 +1,58 @@
+{{> header title}}
+
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span8 offset2 question_background">
+        	<h4>Viewing {{name}} Locations{{#unless infiniteRadius}} Within {{radius}} Kilometers {{else}} worldwide {{/unless}}</h4>
+        	   <div class="btn-group">
+                <button class="btn btn-primary">Options</button>
+                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="resultslistfromtemplate.html">Alter Search Settings</a></li> 
+                    <li><a href="selectlandingread.html">Choose a New Starting Point</a></li>
+                    <li><a href="mapentries.html">View Results as Map</a></li>
+                </ul>
+                </div>
+      	    </div>
+    </div>
+   	<div class="spacer10"></div>
+	    <div class="row-fluid">
+	      <div class="span8 offset2 question_background">   
+	      {{#each categories}}  
+	      
+
+		<h3>{{name}}</h3>
+	    <table class="table table-bordered linktable" style="color:white;">
+		    <tr class="meta">
+			    <td>Name</td>
+			    <td>Score</td>
+		    </tr>
+
+			{{#each entries}}
+			{{#unless more}}
+			    <tr class="entry" id="{{path}}">
+					    <td><a href="viewratingfromtemplate.html"><h5>{{name}}</h5></a></td>  
+					    <td><h5>{{avg}}</h5></td> 
+			    </tr>
+			{{else}}
+			<tr class="more" id="{{table}}">
+				<td colspan="2">
+					<h5>More...</h5>
+				</td>
+			</tr>
+			{{/unless}}
+			{{/each}}
+
+		</table>
+
+    	<div class="spacer10"></div>
+		{{/each}}
+
+		    </div>
+		</div>
+	
+</div>
+
+{{>modal}}

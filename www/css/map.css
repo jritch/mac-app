@@ -1,0 +1,44 @@
+  #map{
+    height: 100%;
+    margin: 0;
+    min-height: 500px;
+    color:#3198B6;
+    font-size:110%
+  }
+
+
+@media (max-width: 767px) {
+	    
+	    body
+        {
+          padding-right:0;
+          padding-left:0;
+        }
+
+/*
+        #mapcontainer
+        {
+          width: 100vw;
+          float:none;
+          display: inline;
+          margin-right: auto;
+          margin-left: auto;
+          padding-left: 0;
+          padding-right: 0;
+        }
+*/
+}
+
+@media (max-height: 799px) {
+  /*body, html {
+    height: 100%;
+  } 
+
+  .container-fluid {
+    
+  }*/
+
+  #map{
+    min-height: 300px;
+  }
+}

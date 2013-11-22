@@ -1,0 +1,24 @@
+<form style="margin:0" class="form-search">
+                    <label class="control-label"><h4>Find a location within...</h4></label>
+                    <div class="controls">
+                      <label class="radio inline" for="radio1">
+                        <input type="radio" id="radio1" name="radius_group" value="10"> 10 km
+                      </label>
+                      <label class="radio inline" for="radio2">
+                        <input type="radio" id="radio2" name="radius_group" value="20"> 20 km
+                      </label>
+                      <label class="radio inline" for="radio3">
+                        <input type="radio" id="radio3" name="radius_group" value="50"> 50 km
+                        </label>
+
+                      {{#unless infiniteRadius}}
+                      <br><br>
+                      <label class="radio inline" for="radio4">
+                        <input type="radio" id="radio4" name="radius_group" value="all"> Worldwide
+                      </label>
+                      {{/unless}}
+
+                      <br><br>
+                     <button type="submit" id="apply" class="btn btn-primary" >Apply</button>
+                    </div> 
+</form>
